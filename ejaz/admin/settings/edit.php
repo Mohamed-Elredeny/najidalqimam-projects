@@ -1,0 +1,1 @@
+<?php /* Edit site settings */ ?>

@@ -1,0 +1,1 @@
+<?php /* View details for blogs */ ?>

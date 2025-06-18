@@ -1,0 +1,1 @@
+<?php /* Delete action for blogs */ ?>

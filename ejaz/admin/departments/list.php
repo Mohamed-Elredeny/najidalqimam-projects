@@ -1,0 +1,1 @@
+<?php /* List page for departments */ ?>
