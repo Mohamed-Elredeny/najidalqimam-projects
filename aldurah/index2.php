@@ -367,8 +367,10 @@
         }
 
         .ai-brain {
-            width: 100%;
-            max-width: 400px;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            border-radius: 15px;
             filter: drop-shadow(0 0 20px rgba(156, 84, 255, 0.5));
         }
 
@@ -738,17 +740,27 @@
 
         .contact-item {
             display: flex;
-            align-items: flex-start;
-            gap: 1rem;
+            align-items: center;
+            gap: 1.5rem;
+            flex-direction: row;
+            margin-bottom: 1.5rem;
+        }
+
+        html[dir="rtl"] .contact-item {
+            text-align: right;
         }
 
         html[dir="ltr"] .contact-item {
-            flex-direction: row-reverse;
+            text-align: left;
         }
 
         .contact-icon {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: #9c54ff;
+            min-width: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .contact-details h3 {
@@ -1060,8 +1072,12 @@
 
         .modal-media img {
             width: 100%;
+            max-width: 900px;
             height: auto;
+            max-height: 500px;
+            object-fit: cover;
             display: block;
+            border-radius: 10px;
         }
 
         .modal-features {
@@ -1243,7 +1259,7 @@
             </div>
         </div>
         <div class="ai-float">
-            <img src="/api/placeholder/500/500" alt="Brain AI" class="ai-brain">
+            <img src="assets/Ai-Brain.jpg" alt="Brain AI" class="ai-brain">
         </div>
         <div class="scroll-down">
             <div class="scroll-down-text" data-key="scrollDown"></div>
@@ -1336,7 +1352,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-media">
-                    <img src="/api/placeholder/900/500" alt="Service" id="modal-image">
+                    <img src="assets/AI-Consulting-Service.jpg" alt="Service" id="modal-image">
                 </div>
                 <h3 id="modal-subtitle"></h3>
                 <p id="modal-text"></p>
@@ -1620,7 +1636,7 @@
                 sendMessage: "إرسال الرسالة",
                 
                 // Footer
-                copyright: "© ٢٠٢٥ الدرة. جميع الحقوق محفوظة."
+                copyright: "Copyright ©️ 2025 Al Durah | Powered by Najid AlQmam"
             },
             en: {
                 // Navigation
@@ -1865,7 +1881,7 @@
                 sendMessage: "Send Message",
                 
                 // Footer
-                copyright: "© 2025 Al Durah. All rights reserved."
+                copyright: "Copyright ©️ 2025 Al Durah | Powered by Najid AlQmam"
             }
         };
 
@@ -1992,11 +2008,11 @@
                 const contactItem = document.createElement('div');
                 contactItem.className = 'contact-item';
                 contactItem.innerHTML = `
+                    <div class="contact-icon"><i class="${item.icon}"></i></div>
                     <div class="contact-details">
                         <h3>${item.title}</h3>
                         <p>${item.details}</p>
                     </div>
-                    <div class="contact-icon"><i class="${item.icon}"></i></div>
                 `;
                 contactInfo.appendChild(contactItem);
             });
@@ -2055,6 +2071,22 @@
                         // Set buttons
                         document.getElementById('modal-cta').innerText = serviceData.modalContent.ctaButton;
                         document.getElementById('modal-secondary').innerText = serviceData.modalContent.secondaryButton;
+                        
+                        // Set service image based on service ID
+                        const serviceImages = {
+                            'ai-consulting': 'assets/AI-Consulting-Service.jpg',
+                            'machine-learning': 'assets/Machine-Learning.jpg',
+                            'conversational-ai': 'assets/Conversational-AI.jpg',
+                            'predictive-analytics': 'assets/Predictive.jpg',
+                            'computer-vision': 'assets/facial-recognition-collage-concept.jpg',
+                            'process-automation': 'assets/Process-Workflow.jpg'
+                        };
+                        
+                        const modalImage = document.getElementById('modal-image');
+                        if (serviceImages[serviceId]) {
+                            modalImage.src = serviceImages[serviceId];
+                            modalImage.alt = serviceData.modalContent.title;
+                        }
                         
                         // Show modal
                         modal.classList.add('active');
