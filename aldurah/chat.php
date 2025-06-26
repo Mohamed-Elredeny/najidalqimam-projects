@@ -4,6 +4,33 @@
 
 session_start();
 
+// Load environment variables
+function loadEnv($filePath) {
+    if (!file_exists($filePath)) {
+        return;
+    }
+    
+    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) {
+            continue; // Skip comments
+        }
+        
+        if (strpos($line, '=') !== false) {
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+            
+            if (!array_key_exists($name, $_ENV)) {
+                $_ENV[$name] = $value;
+            }
+        }
+    }
+}
+
+// Load .env file
+loadEnv(__DIR__ . '/.env');
+
 // Handle file uploads
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
     header('Content-Type: application/json');
@@ -60,8 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'chat') {
     header('Content-Type: application/json');
     
-    // 🔑 PUT YOUR CHATGPT API TOKEN HERE
-    $OPENAI_API_KEY = ";
+    // 🔑 GET OPENAI API KEY FROM ENVIRONMENT VARIABLE
+    $OPENAI_API_KEY = $_ENV['OPENAI_API_KEY'] ?? '';
     $userMessage = $_POST['message'] ?? '';
     
     if (empty($userMessage)) {
