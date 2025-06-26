@@ -98,7 +98,7 @@
         <div class="container mx-auto">
             <div class="flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 mb-10 md:mb-0">
-                    <img src="/api/placeholder/600/400" alt="عن نجد القمم" class="rounded-lg shadow-lg">
+                    <img src="static/3.png" alt="عن نجد القمم" class="rounded-lg shadow-lg">
                 </div>
                 <div class="md:w-1/2 md:pr-12">
                     <h2 class="text-3xl font-bold mb-6 text-gray-800">عن مؤسسة نجد القمم للمقاولات</h2>

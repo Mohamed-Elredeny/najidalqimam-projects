@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost';
+$host = '127.0.0.1';
 $db   = 'najidalqimam_ejaz';
 $user = 'najidalqimam_ejaz';
 $pass = 'u(&3+Nj&lg{S';
