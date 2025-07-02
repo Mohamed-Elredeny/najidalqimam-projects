@@ -1,3 +1,141 @@
+<?php
+// Environment variables for email configuration
+$smtp_email = $_ENV['SMTP_EMAIL'] ?? getenv('SMTP_EMAIL') ?? '';
+$smtp_password = $_ENV['SMTP_PASSWORD'] ?? getenv('SMTP_PASSWORD') ?? '';
+$recipient_email = $_ENV['RECIPIENT_EMAIL'] ?? getenv('RECIPIENT_EMAIL') ?? '';
+
+// Fallback configuration (for testing only - remove in production)
+// Uncomment and set these values for testing, then comment them out and use environment variables
+/*
+$smtp_email = 'your-email@gmail.com';
+$smtp_password = 'your-app-password';
+$recipient_email = 'info@najidalqimam.sa';
+*/
+
+// Initialize response variables
+$success_message = '';
+$error_message = '';
+
+// Process form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
+    // Sanitize and validate input data
+    $full_name = filter_var(trim($_POST['full_name'] ?? ''), FILTER_SANITIZE_STRING);
+    $phone = filter_var(trim($_POST['phone'] ?? ''), FILTER_SANITIZE_STRING);
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    $location = filter_var(trim($_POST['location'] ?? ''), FILTER_SANITIZE_STRING);
+    $project_area = filter_var(trim($_POST['project_area'] ?? ''), FILTER_SANITIZE_STRING);
+    $start_date = filter_var(trim($_POST['start_date'] ?? ''), FILTER_SANITIZE_STRING);
+    $additional_details = filter_var(trim($_POST['additional_details'] ?? ''), FILTER_SANITIZE_STRING);
+    
+    // Handle project types (checkboxes)
+    $project_types = [];
+    if (isset($_POST['project_type'])) {
+        foreach ($_POST['project_type'] as $type) {
+            $project_types[] = filter_var($type, FILTER_SANITIZE_STRING);
+        }
+    }
+    $project_types_str = implode(', ', $project_types);
+    
+    // Basic validation
+    $errors = [];
+    if (empty($full_name)) $errors[] = 'الاسم الكامل مطلوب';
+    if (empty($phone)) $errors[] = 'رقم الجوال مطلوب';
+    if (empty($email)) $errors[] = 'البريد الإلكتروني غير صحيح';
+    if (empty($location)) $errors[] = 'المدينة / الموقع مطلوب';
+    if (empty($recipient_email)) $errors[] = 'خطأ في إعدادات النظام - البريد المستقبل غير محدد';
+    
+    if (empty($errors)) {
+        // Prepare email content
+        $subject = "طلب عرض سعر جديد من موقع نجد القمم - " . $full_name;
+        
+        $message = "
+        <html dir='rtl'>
+        <head>
+            <meta charset='UTF-8'>
+            <style>
+                body { font-family: Tahoma, Arial, sans-serif; line-height: 1.6; color: #333; }
+                .header { background-color: #12758a; color: white; padding: 20px; text-align: center; }
+                .content { padding: 20px; }
+                .field { margin-bottom: 15px; }
+                .label { font-weight: bold; color: #12758a; }
+                .value { margin-top: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class='header'>
+                <h2>طلب عرض سعر جديد</h2>
+                <p>مؤسسة نجد القمم للمقاولات</p>
+            </div>
+            <div class='content'>
+                <div class='field'>
+                    <div class='label'>الاسم الكامل:</div>
+                    <div class='value'>" . htmlspecialchars($full_name) . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>رقم الجوال:</div>
+                    <div class='value'>" . htmlspecialchars($phone) . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>البريد الإلكتروني:</div>
+                    <div class='value'>" . htmlspecialchars($email) . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>المدينة / الموقع:</div>
+                    <div class='value'>" . htmlspecialchars($location) . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>نوع المشروع:</div>
+                    <div class='value'>" . htmlspecialchars($project_types_str ?: 'غير محدد') . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>مساحة المشروع:</div>
+                    <div class='value'>" . htmlspecialchars($project_area ?: 'غير محدد') . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>تاريخ البدء المتوقع:</div>
+                    <div class='value'>" . htmlspecialchars($start_date ?: 'غير محدد') . "</div>
+                </div>
+                
+                <div class='field'>
+                    <div class='label'>تفاصيل إضافية:</div>
+                    <div class='value'>" . nl2br(htmlspecialchars($additional_details ?: 'لا توجد تفاصيل إضافية')) . "</div>
+                </div>
+                
+                <hr style='margin: 20px 0;'>
+                <p style='color: #666; font-size: 12px;'>تم إرسال هذا الطلب من موقع نجد القمم للمقاولات<br>
+                تاريخ الإرسال: " . date('Y-m-d H:i:s') . "</p>
+            </div>
+        </body>
+        </html>";
+        
+        // Email headers
+        $headers = array(
+            'MIME-Version: 1.0',
+            'Content-type: text/html; charset=UTF-8',
+            'From: ' . $smtp_email,
+            'Reply-To: ' . $email,
+            'X-Mailer: PHP/' . phpversion()
+        );
+        
+        // Send email
+        if (mail($recipient_email, $subject, $message, implode("\r\n", $headers))) {
+            $success_message = 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.';
+            // Clear form data on success
+            $_POST = array();
+        } else {
+            $error_message = 'حدث خطأ في إرسال الطلب. يرجى المحاولة مرة أخرى أو التواصل معنا مباشرة.';
+        }
+    } else {
+        $error_message = implode('<br>', $errors);
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -64,7 +202,7 @@
     <nav class="bg-white shadow-md py-4">
         <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
             <a href="#" class="flex items-center">
-                <img src="static/logo.png" alt="نجد القمم" class="h-12">
+                <img src="static/top_logo.png" alt="نجد القمم" class="h-12 object-contain">
             </a>
             <div class="hidden md:flex items-center space-x-4">
                 <a href="#" class="mx-2 text-gray-700 hover:text-teal-600 transition-colors">الرئيسية</a>
@@ -693,30 +831,53 @@
                 </div>
                 <div>
                     <h3 class="text-2xl font-bold mb-6 text-gray-800">طلب عرض سعر</h3>
-                    <form class="contact-form">
+                    
+                    <?php if (!empty($success_message)): ?>
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6" role="alert">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <?php echo $success_message; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($error_message)): ?>
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <?php echo $error_message; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <form class="contact-form" method="POST" action="">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <input type="text" placeholder="الاسم الكامل" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
-                            <input type="tel" placeholder="رقم الجوال" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
+                            <input type="text" name="full_name" placeholder="الاسم الكامل" value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
+                            <input type="tel" name="phone" placeholder="رقم الجوال" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <input type="email" placeholder="البريد الإلكتروني" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
-                            <input type="text" placeholder="المدينة / الموقع" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
+                            <input type="email" name="email" placeholder="البريد الإلكتروني" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
+                            <input type="text" name="location" placeholder="المدينة / الموقع" value="<?php echo htmlspecialchars($_POST['location'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
                         </div>
                         <div class="mb-4">
                             <label class="block text-gray-700 font-bold mb-2">نوع المشروع:</label>
                             <div class="grid grid-cols-2 gap-2 text-sm">
-                                <label class="flex items-center"><input type="checkbox" class="mr-2"> سكني</label>
-                                <label class="flex items-center"><input type="checkbox" class="mr-2"> تجاري</label>
-                                <label class="flex items-center"><input type="checkbox" class="mr-2"> صناعي</label>
-                                <label class="flex items-center"><input type="checkbox" class="mr-2"> ترميم / صيانة</label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="project_type[]" value="سكني" <?php echo (isset($_POST['project_type']) && in_array('سكني', $_POST['project_type'])) ? 'checked' : ''; ?> class="mr-2"> سكني
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="project_type[]" value="تجاري" <?php echo (isset($_POST['project_type']) && in_array('تجاري', $_POST['project_type'])) ? 'checked' : ''; ?> class="mr-2"> تجاري
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="project_type[]" value="صناعي" <?php echo (isset($_POST['project_type']) && in_array('صناعي', $_POST['project_type'])) ? 'checked' : ''; ?> class="mr-2"> صناعي
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="project_type[]" value="ترميم / صيانة" <?php echo (isset($_POST['project_type']) && in_array('ترميم / صيانة', $_POST['project_type'])) ? 'checked' : ''; ?> class="mr-2"> ترميم / صيانة
+                                </label>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <input type="text" placeholder="مساحة المشروع (م²)" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
-                            <input type="date" placeholder="تاريخ البدء المتوقع" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
+                            <input type="text" name="project_area" placeholder="مساحة المشروع (م²)" value="<?php echo htmlspecialchars($_POST['project_area'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
+                            <input type="date" name="start_date" placeholder="تاريخ البدء المتوقع" value="<?php echo htmlspecialchars($_POST['start_date'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600">
                         </div>
-                        <textarea rows="4" placeholder="تفاصيل إضافية أو متطلبات خاصة" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600 mb-4"></textarea>
-                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">إرسال طلب العرض</button>
+                        <textarea name="additional_details" rows="4" placeholder="تفاصيل إضافية أو متطلبات خاصة" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600 mb-4"><?php echo htmlspecialchars($_POST['additional_details'] ?? ''); ?></textarea>
+                        <button type="submit" name="submit_quote" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">إرسال طلب العرض</button>
                     </form>
                 </div>
             </div>
@@ -728,8 +889,8 @@
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                    <div class="bg-white p-4 rounded-lg mb-4 inline-block">
-                        <img src="static/logo.png" alt="نجد القمم" class="h-20">
+                    <div class="mb-4">
+                        <img src="static/bot_logo.png" alt="نجد القمم" class="h-16 object-contain filter invert">
                     </div>
                     <p class="text-gray-300 mb-4">مؤسسة سعودية متخصصة في تقديم خدمات المقاولات العامة والتشطيبات بأعلى معايير الجودة والمهنية.</p>
                     <div class="flex space-x-4">

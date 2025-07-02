@@ -1224,12 +1224,12 @@ require_once('chat.php');
     <div id="lottie-container"></div>
     
     <nav class="nav-container">
-        <div class="logo"><span>⬢</span><span class="logo-text">الدرة</span></div>
+        <div class="logo"><span>⬢</span><span class="logo-text">الديرة</span></div>
         <div class="nav-links">
             <a href="#services" class="nav-link" data-key="services"></a>
             <a href="#features" class="nav-link" data-key="features"></a>
             <a href="#about" class="nav-link" data-key="about"></a>
-            <a href="#testimonials" class="nav-link" data-key="testimonials"></a>
+
             <a href="#contact" class="nav-link" data-key="contact"></a>
         </div>
         <button class="cta-btn" data-key="getStarted"></button>
@@ -1245,7 +1245,7 @@ require_once('chat.php');
         <a href="#services" class="mobile-nav-link" data-key="services"></a>
         <a href="#features" class="mobile-nav-link" data-key="features"></a>
         <a href="#about" class="mobile-nav-link" data-key="about"></a>
-        <a href="#testimonials" class="mobile-nav-link" data-key="testimonials"></a>
+
         <a href="#contact" class="mobile-nav-link" data-key="contact"></a>
         <button class="cta-btn" style="margin-top: 2rem;" data-key="getStarted"></button>
     </div>
@@ -1292,19 +1292,10 @@ require_once('chat.php');
         </div>
     </section>
     
-    <section class="section" id="testimonials">
-        <h2 class="section-title" data-key="clientTestimonials"></h2>
-        <div class="testimonial-slider">
-            <div class="testimonial-slide">
-                <div class="testimonial-content" data-key="testimonialContent"></div>
-                <div class="testimonial-author" data-key="testimonialAuthor"></div>
-                <div class="testimonial-position" data-key="testimonialPosition"></div>
-            </div>
-        </div>
-    </section>
+
     
     <section class="section" id="contact">
-        <h2 class="section-title" data-key="contactUs"></h2>
+        <h2 class="section-title" data-key="contact"></h2>
         <div class="contact">
             <div class="contact-info">
                 <!-- Contact info will be generated dynamically -->
@@ -1326,7 +1317,7 @@ require_once('chat.php');
                     <label for="message" data-key="message"></label>
                     <textarea id="message" data-key="enterMessage" data-placeholder="true"></textarea>
                 </div>
-                <button class="cta-btn" data-key="sendMessage"></button>
+                <button class="cta-btn" data-key="sendMessage" onclick="submitQuoteForm()"></button>
             </div>
         </div>
     </section>
@@ -1398,12 +1389,12 @@ require_once('chat.php');
         const content = {
             ar: {
                 // Navigation
-                logo: "الدرة",
+                logo: "الديرة",
                 services: "الخدمات",
                 features: "المميزات",
                 about: "عن الشركة",
                 testimonials: "آراء العملاء",
-                contact: "اتصل بنا",
+                contact: "احصل على عرض أسعار",
                 getStarted: "ابدأ الآن",
                 
                 // Hero Section
@@ -1558,7 +1549,7 @@ require_once('chat.php');
                 ],
                 
                 // Features Section
-                whyChooseUs: "لماذا تختار الدرة",
+                whyChooseUs: "لماذا تختار الديرة",
                 featuresData: [
                     {
                         icon: "١",
@@ -1605,7 +1596,7 @@ require_once('chat.php');
                 
                 // Testimonials Section
                 clientTestimonials: "ماذا يقول عملاؤنا",
-                testimonialContent: "لقد حولت الدرة عمليات خدمة العملاء لدينا بحل الذكاء الاصطناعي التحاوري. لقد شهدنا انخفاضًا بنسبة ٤٠٪ في أوقات الاستجابة ودرجات غير مسبوقة من رضا العملاء. كما أن قدرة نظامهم على التعلم والتكيف مع احتياجاتنا المتغيرة كانت مذهلة.",
+                testimonialContent: "لقد حولت الديرة عمليات خدمة العملاء لدينا بحل الذكاء الاصطناعي التحاوري. لقد شهدنا انخفاضًا بنسبة ٤٠٪ في أوقات الاستجابة ودرجات غير مسبوقة من رضا العملاء. كما أن قدرة نظامهم على التعلم والتكيف مع احتياجاتنا المتغيرة كانت مذهلة.",
                 testimonialAuthor: "سارة جونسون",
                 testimonialPosition: "المدير التقني، شركة التجزئة العالمية",
                 
@@ -1615,17 +1606,17 @@ require_once('chat.php');
                     {
                         icon: "fas fa-map-marker-alt",
                         title: "العنوان",
-                        details: "١٢٣ طريق الابتكار، حي التقنية، سان فرانسيسكو، كاليفورنيا ٩٤١٠٧، الولايات المتحدة الأمريكية"
+                        details: "السعودية، الرياض - زهرة لبن - شارع الطائف"
                     },
                     {
                         icon: "fas fa-phone-alt",
                         title: "الهاتف",
-                        details: "+١ (٥٥٥) ١٢٣-٤٥٦٧"
+                        details: "966500045778"
                     },
                     {
                         icon: "fas fa-envelope",
                         title: "البريد الإلكتروني",
-                        details: "contact@aldurah.tech"
+                        details: "info@najidalqimam.sa"
                     }
                 ],
                 fullName: "الاسم الكامل",
@@ -1648,7 +1639,7 @@ require_once('chat.php');
                 features: "Features",
                 about: "About",
                 testimonials: "Testimonials",
-                contact: "Contact",
+                contact: "Get a Quote",
                 getStarted: "Get Started",
                 
                 // Hero Section
@@ -1860,17 +1851,17 @@ require_once('chat.php');
                     {
                         icon: "fas fa-map-marker-alt",
                         title: "Address",
-                        details: "123 Innovation Drive, Tech District, San Francisco, CA 94107, USA"
+                        details: "Saudi Arabia, Ryiadh - Zahrat Laban -Al Taif Street"
                     },
                     {
                         icon: "fas fa-phone-alt",
                         title: "Phone",
-                        details: "+1 (555) 123-4567"
+                        details: "966500045778"
                     },
                     {
                         icon: "fas fa-envelope",
                         title: "Email",
-                        details: "contact@aldurah.tech"
+                        details: "info@najidalqimam.sa"
                     }
                 ],
                 fullName: "Full Name",
@@ -2033,7 +2024,7 @@ require_once('chat.php');
             const footerLinks = document.querySelector('.footer-links');
             footerLinks.innerHTML = '';
             
-            ['contact', 'testimonials', 'about', 'features', 'services'].forEach(key => {
+            ['contact', 'about', 'features', 'services'].forEach(key => {
                 const link = document.createElement('a');
                 link.href = `#${key}`;
                 link.innerText = content[lang][key];
@@ -2251,18 +2242,7 @@ require_once('chat.php');
                 });
             });
             
-            // Testimonial animation
-            gsap.to('.testimonial-slider', {
-                scrollTrigger: {
-                    trigger: '.testimonial-slider',
-                    start: 'top 80%',
-                    toggleActions: 'play none none none'
-                },
-                opacity: 1,
-                scale: 1,
-                duration: 0.8,
-                ease: 'power3.out'
-            });
+
             
             // Three.js Particle Animation
             const canvas = document.getElementById('canvas-container');
@@ -2408,6 +2388,67 @@ require_once('chat.php');
                 });
             });
         });
+
+        // Form submission function
+        function submitQuoteForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const company = document.getElementById('company').value;
+            const message = document.getElementById('message').value;
+
+            // Validate form
+            if (!name || !email || !message) {
+                alert(currentLang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                alert(currentLang === 'ar' ? 'يرجى إدخال بريد إلكتروني صالح' : 'Please enter a valid email address');
+                return;
+            }
+
+            // Show loading state
+            const button = document.querySelector('[data-key="sendMessage"]');
+            const originalText = button.innerText;
+            button.innerText = currentLang === 'ar' ? 'جارٍ الإرسال...' : 'Sending...';
+            button.disabled = true;
+
+            // Submit form
+            fetch('send_message.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    company: company,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(currentLang === 'ar' ? 'شكراً لك! سنتواصل معك قريباً.' : 'Thank you! We will get back to you soon.');
+                    // Clear form
+                    document.getElementById('name').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('company').value = '';
+                    document.getElementById('message').value = '';
+                } else {
+                    alert(data.message || (currentLang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(currentLang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                button.innerText = originalText;
+                button.disabled = false;
+            });
+        }
     </script>
 </body>
 </html>

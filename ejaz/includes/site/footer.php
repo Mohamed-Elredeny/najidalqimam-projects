@@ -31,7 +31,7 @@ $extraNavLinks = $extraNavStmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="col-lg-4 col-md-6">
                 <div class="footer-about">
                     <div class="footer-logo">
-                        <img src="assets/images/logo-white.png" alt="شركة انجاز النوادي للمقاولات">
+                        <img src="assets/images/logo.png" alt="شركة انجاز النوادي للمقاولات">
                     </div>
                     <p>
                         <?= $lang === 'ar'
