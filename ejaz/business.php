@@ -1,5 +1,12 @@
+<?php
+// Include database connection
+require_once 'config/db.php';
+
+// Set language
+$lang = $_GET['lang'] ?? 'ar';
+?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="<?= $lang ?>" dir="<?= $lang === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -737,62 +744,7 @@
     </section>
     
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-about">
-                        <div class="footer-logo">
-                            <img src="https://placeholder.pics/svg/200x80/FFFFFF/555555/LOGO" alt="شركة انجاز النوادي للمقاولات">
-                        </div>
-                        <p>شركة انجاز النوادي للمقاولات العامة هي واحدة من الشركات الرائدة في مجال المقاولات والبناء في المملكة العربية السعودية، وتتميز بخبرة تمتد لأكثر من 15 عاماً في تنفيذ مشاريع متنوعة.</p>
-                        <div class="social-links">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-6">
-                    <h4>روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">الرئيسية</a></li>
-                        <li><a href="about.html">عن الشركة</a></li>
-                        <li><a href="services.html">خدماتنا</a></li>
-                        <li><a href="projects.html">المشاريع</a></li>
-                        <li><a href="blog.html">المدونة</a></li>
-                        <li><a href="contact.html">اتصل بنا</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-2 col-md-6">
-                    <h4>روابط مفيدة</h4>
-                    <ul class="footer-links">
-                        <li><a href="terms.html">الشروط والأحكام</a></li>
-                        <li><a href="privacy.html">سياسة الخصوصية</a></li>
-                        <li><a href="faq.html">الأسئلة الشائعة</a></li>
-                        <li><a href="career.html">الوظائف</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <h4>وسائل التواصل</h4>
-                    <ul class="footer-contact">
-                        <li><i class="fas fa-map-marker-alt"></i> الدمام، طريق الملك سعود، حي العنود، مبنى راحتي، الطابق الثاني</li>
-                        <li><i class="fas fa-phone-alt"></i> <span dir="ltr">+966 59 991 2030</span></li>
-                        <li><i class="fas fa-envelope"></i> <span>info@company.com</span></li>
-                        <li><i class="fas fa-clock"></i> <span>الأحد - الخميس: 8:00 صباحاً - 5:00 مساءً</span></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 شركة انجاز النوادي للمقاولات العامة. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/site/footer.php'; ?>
     
     <!-- Back to Top -->
     <a href="#" class="back-to-top"><i class="fas fa-arrow-up"></i></a>

@@ -1,5 +1,12 @@
+<?php
+// Include database connection
+require_once 'config/db.php';
+
+// Set language
+$lang = $_GET['lang'] ?? 'ar';
+?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="<?= $lang ?>" dir="<?= $lang === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -843,52 +850,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <!-- About -->
-                <div class="col-md-4">
-                    <div class="footer-logo">
-                        <img src="https://placeholder.pics/svg/150x50/333333/ffffff/LOGO" alt="Logo">
-                    </div>
-                    <div class="footer-about">
-                        <p>شركة انجاز النوادي للمقاولات العامة تقدم حلولاً هندسية متكاملة في مجالات المقاولات والبناء والتطوير العقاري.</p>
-                    </div>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-
-                <!-- Links -->
-                <div class="col-md-4">
-                    <h4>روابط مهمة</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">الرئيسية</a></li>
-                        <li><a href="about.html">عن الشركة</a></li>
-                        <li><a href="services.html">خدماتنا</a></li>
-                        <li><a href="projects.html">مشاريعنا</a></li>
-                        <li><a href="contact.html">اتصل بنا</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div class="col-md-4">
-                    <h4>تواصل معنا</h4>
-                    <ul class="footer-contact">
-                        <li><i class="fas fa-map-marker-alt"></i> الدمام، طريق الملك سعود، مبنى راحتي</li>
-                        <li><i class="fas fa-phone-alt"></i> +966 59 991 2030</li>
-                        <li><i class="fas fa-envelope"></i> info@company.com</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                &copy; 2025 <a href="#">شركة انجاز النوادي</a>. جميع الحقوق محفوظة.
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/site/footer.php'; ?>
 
     <!-- Back to Top -->
     <div class="back-to-top" id="backToTop">

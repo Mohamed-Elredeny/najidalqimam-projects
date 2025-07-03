@@ -1,5 +1,12 @@
+<?php
+// Include database connection
+require_once 'config/db.php';
+
+// Set language
+$lang = $_GET['lang'] ?? 'ar';
+?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="<?= $lang ?>" dir="<?= $lang === 'ar' ? 'rtl' : 'ltr' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -949,62 +956,7 @@
     </section>
     
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-about">
-                        <div class="footer-logo">
-                            <img src="https://placeholder.pics/svg/200x80/FFFFFF/555555/LOGO" alt="شركة ايجاز البوادي للمقاولات">
-                        </div>
-                        <p>شركة ايجاز البوادي للمقاولات العامة هي واحدة من الشركات الرائدة في مجال المقاولات والبناء في المملكة العربية السعودية.</p>
-                        <div class="social-links">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-6">
-                    <h4>روابط سريعة</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html">الرئيسية</a></li>
-                        <li><a href="about.html">من نحن</a></li>
-                        <li><a href="departments.html">أقسامنا</a></li>
-                        <li><a href="#projects">مشاريعنا</a></li>
-                        <li><a href="#contact">اتصل بنا</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <h4>خدماتنا</h4>
-                    <ul class="footer-links">
-                        <li><a href="#turnkey">تسليم المفتاح</a></li>
-                        <li><a href="#construction">التنفيذ و البناء</a></li>
-                        <li><a href="#finishing">التشطيبات</a></li>
-                        <li><a href="#renovation">الترميم</a></li>
-                        <li><a href="#roads">تصميم الطرق</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <h4>اتصل بنا</h4>
-                    <ul class="footer-contact">
-                        <li><i class="fas fa-map-marker-alt"></i> الدمام، طريق الملك سعود، حي العنود</li>
-                        <li><i class="fas fa-phone-alt"></i> <span dir="ltr">+966 59 991 2030</span></li>
-                        <li><i class="fas fa-envelope"></i> mkld1397@gmail.com</li>
-                        <li><i class="fas fa-clock"></i> الأحد - الخميس: 8:00 - 17:00</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2025 شركة ايجاز البوادي للمقاولات العامة. جميع الحقوق محفوظة.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/site/footer.php'; ?>
     
     <!-- Back to Top -->
     <a href="#" class="back-to-top"><i class="fas fa-arrow-up"></i></a>
