@@ -881,6 +881,102 @@ $lang = $_GET['lang'] ?? 'ar';
         function toggleLanguage() {
             window.location.href = "contact-en.html";
         }
+
+        // Handle contact form submission with dual submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const form = e.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'جاري الإرسال...';
+            
+            try {
+                // Get form data
+                const name = document.getElementById('name').value;
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                // Validate required fields
+                if (!name || !email || !message) {
+                    alert('يرجى ملء جميع الحقول المطلوبة');
+                    return;
+                }
+                
+                // Prepare PHP form data
+                const formData = new FormData();
+                formData.append('name', name);
+                formData.append('phone', phone);
+                formData.append('email', email);
+                formData.append('service', subject || 'استفسار عام');
+                formData.append('message', message);
+                
+                // Prepare admin API data
+                const adminData = {
+                    site: 'ejaz',
+                    firstName: name,
+                    email: email,
+                    phone: phone,
+                    subject: subject,
+                    message: message
+                };
+                
+                // Submit to both endpoints
+                const results = await Promise.allSettled([
+                    // 1. Submit to existing PHP endpoint (keep original functionality)
+                    fetch('services/site/send_message.php', {
+                        method: 'POST',
+                        body: formData
+                    }),
+                    
+                    // 2. Submit to centralized admin API
+                    fetch('https://stream-co.vercel.app/api/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(adminData)
+                    }).then(response => response.json())
+                ]);
+                
+                const [phpResult, adminResult] = results;
+                
+                console.log('PHP submission result:', phpResult);
+                console.log('Admin API submission result:', adminResult);
+                
+                // Check if at least one submission was successful
+                const phpSuccess = phpResult.status === 'fulfilled' && phpResult.value.ok;
+                const adminSuccess = adminResult.status === 'fulfilled' && adminResult.value.success;
+                
+                if (phpSuccess || adminSuccess) {
+                    alert('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
+                    form.reset(); // Clear the form
+                } else {
+                    throw new Error('Both submissions failed');
+                }
+                
+                // Log any partial failures
+                if (!phpSuccess && adminSuccess) {
+                    console.warn('PHP submission failed, but admin submission succeeded');
+                }
+                if (phpSuccess && !adminSuccess) {
+                    console.warn('Admin submission failed, but PHP submission succeeded');
+                }
+                
+            } catch (error) {
+                console.error('Error in form submission:', error);
+                alert('عذراً، حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى.');
+            } finally {
+                // Restore button state
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
+        });
     </script>
 </body>
 </html>

@@ -195,6 +195,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Fix for submit button visibility */
+        button[type="submit"], .submit-btn {
+            background-color: #0d9488 !important; /* teal-600 */
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: background-color 0.3s ease !important;
+            display: block !important;
+            width: 100% !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        button[type="submit"]:hover, .submit-btn:hover {
+            background-color: #0f766e !important; /* teal-700 */
+        }
+        
+        button[type="submit"]:disabled {
+            background-color: #6b7280 !important;
+            cursor: not-allowed !important;
+        }
     </style>
 </head>
 <body>
@@ -846,7 +871,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
                         </div>
                     <?php endif; ?>
                     
-                    <form class="contact-form" method="POST" action="">
+                    <form id="contactForm" class="contact-form" method="POST" action="">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <input type="text" name="full_name" placeholder="الاسم الكامل" value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
                             <input type="tel" name="phone" placeholder="رقم الجوال" value="<?php echo htmlspecialchars($_POST['phone'] ?? ''); ?>" class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-teal-600" required>
@@ -925,5 +950,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_quote'])) {
             </div>
         </div>
     </footer>
+
+    <script>
+        // Handle contact form submission with dual submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const form = e.target;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'جاري الإرسال...';
+            
+            try {
+                // Get form data
+                const formData = new FormData(form);
+                
+                // Extract individual values
+                const fullName = formData.get('full_name');
+                const phone = formData.get('phone');
+                const email = formData.get('email');
+                const location = formData.get('location');
+                const projectArea = formData.get('project_area');
+                const startDate = formData.get('start_date');
+                const additionalDetails = formData.get('additional_details');
+                
+                // Get project types (checkboxes)
+                const projectTypes = [];
+                const projectTypeCheckboxes = document.querySelectorAll('input[name="project_type[]"]:checked');
+                projectTypeCheckboxes.forEach(checkbox => {
+                    projectTypes.push(checkbox.value);
+                });
+                const projectTypesStr = projectTypes.join(', ');
+                
+                // Prepare comprehensive message for admin API
+                let adminMessage = additionalDetails || '';
+                if (location) adminMessage = `المدينة / الموقع: ${location}\n\n` + adminMessage;
+                if (projectTypesStr) adminMessage = `نوع المشروع: ${projectTypesStr}\n` + adminMessage;
+                if (projectArea) adminMessage = `مساحة المشروع: ${projectArea} م²\n` + adminMessage;
+                if (startDate) adminMessage = `تاريخ البدء المتوقع: ${startDate}\n` + adminMessage;
+                
+                // Prepare admin API data
+                const adminData = {
+                    site: 'najid_almqawlat',
+                    firstName: fullName,
+                    email: email,
+                    phone: phone,
+                    message: adminMessage.trim() || 'طلب عرض سعر لمشروع مقاولات'
+                };
+                
+                // Submit to both endpoints
+                const results = await Promise.allSettled([
+                    // 1. Submit to existing PHP processing (keep original functionality)
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData
+                    }),
+                    
+                                         // 2. Submit to centralized admin API
+                     fetch('https://stream-co.vercel.app/api/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(adminData)
+                    }).then(response => response.json())
+                ]);
+                
+                const [phpResult, adminResult] = results;
+                
+                console.log('PHP submission result:', phpResult);
+                console.log('Admin API submission result:', adminResult);
+                
+                // Check if at least one submission was successful
+                const phpSuccess = phpResult.status === 'fulfilled' && phpResult.value.ok;
+                const adminSuccess = adminResult.status === 'fulfilled' && adminResult.value.success;
+                
+                if (phpSuccess || adminSuccess) {
+                    alert('تم إرسال طلبك بنجاح! سنتواصل معك قريباً.');
+                    
+                    // If PHP succeeded, reload to show success message
+                    if (phpSuccess) {
+                        window.location.reload();
+                    } else {
+                        // If only admin API succeeded, clear form manually
+                        form.reset();
+                    }
+                } else {
+                    throw new Error('Both submissions failed');
+                }
+                
+                // Log any partial failures
+                if (!phpSuccess && adminSuccess) {
+                    console.warn('PHP submission failed, but admin submission succeeded');
+                }
+                if (phpSuccess && !adminSuccess) {
+                    console.warn('Admin submission failed, but PHP submission succeeded');
+                }
+                
+            } catch (error) {
+                console.error('Error in form submission:', error);
+                alert('حدث خطأ في إرسال الطلب. يرجى المحاولة مرة أخرى أو التواصل معنا مباشرة.');
+            } finally {
+                // Restore button state
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
+        });
+    </script>
 </body>
 </html>

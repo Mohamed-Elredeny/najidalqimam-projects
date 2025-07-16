@@ -258,7 +258,7 @@ $options = $pdo->query("SELECT * FROM service_options")->fetchAll(PDO::FETCH_ASS
                 </div>
             </div>
             <div class="col-lg-7" data-aos="fade-up">
-                <form action="services/site/send_message.php" method="post"
+                <form id="contactForm" action="services/site/send_message.php" method="post"
                       class="contact-form p-4 bg-white rounded shadow-sm">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -305,6 +305,89 @@ $options = $pdo->query("SELECT * FROM service_options")->fetchAll(PDO::FETCH_ASS
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
     AOS.init({duration: 1000, once: true});
+
+    // Handle contact form submission with dual submission
+    document.getElementById('contactForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.textContent = '<?= $lang === "ar" ? "جاري الإرسال..." : "Sending..." ?>';
+        
+        try {
+            // Prepare data for both submissions
+            const name = formData.get('name');
+            const phone = formData.get('phone');
+            const email = formData.get('email');
+            const service = formData.get('service');
+            const message = formData.get('message');
+            
+            // Prepare admin API data
+            const adminData = {
+                site: 'ejaz',
+                firstName: name,
+                email: email,
+                phone: phone,
+                service: service,
+                message: message
+            };
+            
+            // Submit to both endpoints
+            const results = await Promise.allSettled([
+                // 1. Submit to existing PHP endpoint (keep original functionality)
+                fetch('services/site/send_message.php', {
+                    method: 'POST',
+                    body: formData
+                }),
+                
+                                 // 2. Submit to centralized admin API
+                 fetch('https://stream-co.vercel.app/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(adminData)
+                }).then(response => response.json())
+            ]);
+            
+            const [phpResult, adminResult] = results;
+            
+            console.log('PHP submission result:', phpResult);
+            console.log('Admin API submission result:', adminResult);
+            
+            // Check if at least one submission was successful
+            const phpSuccess = phpResult.status === 'fulfilled' && phpResult.value.ok;
+            const adminSuccess = adminResult.status === 'fulfilled' && adminResult.value.success;
+            
+            if (phpSuccess || adminSuccess) {
+                alert('<?= $lang === "ar" ? "تم إرسال رسالتك بنجاح! سنتواصل معك قريباً." : "Your message has been sent successfully! We will contact you soon." ?>');
+                form.reset(); // Clear the form
+            } else {
+                throw new Error('Both submissions failed');
+            }
+            
+            // Log any partial failures
+            if (!phpSuccess && adminSuccess) {
+                console.warn('PHP submission failed, but admin submission succeeded');
+            }
+            if (phpSuccess && !adminSuccess) {
+                console.warn('Admin submission failed, but PHP submission succeeded');
+            }
+            
+        } catch (error) {
+            console.error('Error in form submission:', error);
+            alert('<?= $lang === "ar" ? "عذراً، حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى." : "Sorry, there was an error sending your message. Please try again." ?>');
+        } finally {
+            // Restore button state
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        }
+    });
 </script>
 </body>
 </html>
