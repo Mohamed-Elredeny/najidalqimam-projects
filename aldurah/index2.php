@@ -2382,22 +2382,53 @@
             button.innerText = currentLang === 'ar' ? 'جارٍ الإرسال...' : 'Sending...';
             button.disabled = true;
 
-            // Submit form
-            fetch('send_message.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    company: company,
-                    message: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            // Prepare data for both submissions
+            const formData = {
+                name: name,
+                email: email,
+                company: company,
+                message: message
+            };
+
+            // Prepare admin API data
+            const adminData = {
+                site: 'aldeerah',
+                firstName: name,
+                email: email,
+                message: company ? `الشركة: ${company}\n\n${message}` : message
+            };
+
+            // Submit to both endpoints
+            Promise.allSettled([
+                // 1. Submit to existing send_message.php (keep original functionality)
+                fetch('send_message.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                }).then(response => response.json()),
+
+                // 2. Submit to centralized admin API
+                fetch('https://stream-co.vercel.app/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(adminData)
+                }).then(response => response.json())
+            ])
+            .then(results => {
+                const [emailResult, adminResult] = results;
+                
+                console.log('Email submission result:', emailResult);
+                console.log('Admin API submission result:', adminResult);
+
+                // Check if at least one submission was successful
+                const emailSuccess = emailResult.status === 'fulfilled' && emailResult.value.success;
+                const adminSuccess = adminResult.status === 'fulfilled' && adminResult.value.success;
+
+                if (emailSuccess || adminSuccess) {
                     alert(currentLang === 'ar' ? 'شكراً لك! سنتواصل معك قريباً.' : 'Thank you! We will get back to you soon.');
                     // Clear form
                     document.getElementById('name').value = '';
@@ -2405,11 +2436,26 @@
                     document.getElementById('company').value = '';
                     document.getElementById('message').value = '';
                 } else {
-                    alert(data.message || (currentLang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.'));
+                    // Both failed, show error
+                    const emailError = emailResult.status === 'rejected' ? emailResult.reason : emailResult.value?.message;
+                    const adminError = adminResult.status === 'rejected' ? adminResult.reason : adminResult.value?.error;
+                    
+                    console.error('Email submission failed:', emailError);
+                    console.error('Admin submission failed:', adminError);
+                    
+                    alert(currentLang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.');
+                }
+
+                // Log any partial failures
+                if (!emailSuccess && adminSuccess) {
+                    console.warn('Email submission failed, but admin submission succeeded');
+                }
+                if (emailSuccess && !adminSuccess) {
+                    console.warn('Admin submission failed, but email submission succeeded');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error in submissions:', error);
                 alert(currentLang === 'ar' ? 'حدث خطأ. يرجى المحاولة مرة أخرى.' : 'An error occurred. Please try again.');
             })
             .finally(() => {
